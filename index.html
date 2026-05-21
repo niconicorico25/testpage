@@ -43,22 +43,30 @@
     // 遷移先のAmazon情報
     const asin = "B0GQGL2WQJ";
     const webUrl = "https://www.amazon.co.jp/dp/" + asin;
-    
-    // スマホアプリ起動用のURLスキーム (iOS / Android共通)
-    const appUrl = "com.amazon.mobile.shopping://www.amazon.co.jp/dp/" + asin;
 
     function redirect() {
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
         const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
+        const isAndroid = /android/i.test(userAgent);
 
         if (isMobile) {
-            // ① まずはアプリの強制起動を試みる
+            let appUrl = "";
+
+            if (isAndroid) {
+                // 【Android用の修正】IntentというAndroid特有の強力な命令文に変えて商品ページへ飛ばす
+                appUrl = "intent://www.amazon.co.jp/dp/" + asin + "/#Intent;scheme=https;package=com.amazon.mShop.android.shopping;end";
+            } else {
+                // 【iOS（iPhone）用の修正】トップに弾かれないWeb兼用URLスキームに変えて商品ページへ飛ばす
+                appUrl = "com.amazon.mobile.shopping.web://amazon.co.jp/dp/" + asin;
+            }
+
+            // ① アプリの起動を試みる
             window.location.href = appUrl;
 
-            // ② アプリがインストールされていない場合のフォールバック（0.5秒後にブラウザ版を開く）
+            // ② アプリがない、または起動に失敗した場合のフォールバック（0.8秒後にブラウザで開く）
             setTimeout(function() {
                 window.location.href = webUrl;
-            }, 500);
+            }, 800);
         } else {
             // PCの場合は通常のWEBブラウザで遷移
             window.location.href = webUrl;
