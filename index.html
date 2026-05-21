@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #333;
+            background-color: #fafafa;
+        }
+        .loader-container {
+            text-align: center;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #ff9900; /* Amazonカラー */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="loader-container">
+    <div class="spinner"></div>
+    <p>Amazonへ移動しています...</p>
+</div>
+
+<script>
+    // 遷移先のAmazon情報
+    const asin = "B0GQGL2WQJ";
+    const webUrl = "https://www.amazon.co.jp/dp/" + asin;
+    
+    // スマホアプリ起動用のURLスキーム (iOS / Android共通)
+    const appUrl = "com.amazon.mobile.shopping://www.amazon.co.jp/dp/" + asin;
+
+    function redirect() {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        const isMobile = /android|iphone|ipad|ipod/i.test(userAgent);
+
+        if (isMobile) {
+            // ① まずはアプリの強制起動を試みる
+            window.location.href = appUrl;
+
+            // ② アプリがインストールされていない場合のフォールバック（0.5秒後にブラウザ版を開く）
+            setTimeout(function() {
+                window.location.href = webUrl;
+            }, 500);
+        } else {
+            // PCの場合は通常のWEBブラウザで遷移
+            window.location.href = webUrl;
+        }
+    }
+
+    // ページ読み込みと同時に実行
+    window.onload = redirect;
+</script>
+
+</body>
+</html>
